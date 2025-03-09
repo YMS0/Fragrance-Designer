@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance Designer</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .notes { margin: 10px 0; width: 100%; padding: 5px; }
+        .pyramid { text-align: center; background: #f4f4f4; padding: 20px; border-radius: 10px; }
+        .note-image { width: 80px; height: 80px; margin: 5px; display: inline-block; }
+        .autocomplete-items { position: absolute; border: 1px solid #d4d4d4; border-bottom: none; border-top: none; z-index: 99; max-height: 150px; overflow-y: auto; background: white; }
+        .autocomplete-items div { padding: 10px; cursor: pointer; }
+        .autocomplete-items div:hover { background-color: #e9e9e9; }
+        .autocomplete { position: relative; display: inline-block; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fragrance Designer</h1>
+        <p>Enter the notes for your custom fragrance:</p>
+        
+        <label>Top Notes:</label>
+        <div class="autocomplete">
+            <input type="text" id="topNotes" class="notes" placeholder="Type to search...">
+        </div>
+        
+        <label>Middle Notes:</label>
+        <div class="autocomplete">
+            <input type="text" id="middleNotes" class="notes" placeholder="Type to search...">
+        </div>
+        
+        <label>Base Notes:</label>
+        <div class="autocomplete">
+            <input type="text" id="baseNotes" class="notes" placeholder="Type to search...">
+        </div>
+        
+        <button onclick="generatePyramid()">Generate Fragrance</button>
+        
+        <div id="fragrancePyramid" class="pyramid" style="display: none;">
+            <h2>Your Fragrance Pyramid</h2>
+            <h3>Top Notes:</h3>
+            <p id="displayTop"></p>
+            <div id="topImages"></div>
+            
+            <h3>Middle Notes:</h3>
+            <p id="displayMiddle"></p>
+            <div id="middleImages"></div>
+            
+            <h3>Base Notes:</h3>
+            <p id="displayBase"></p>
+            <div id="baseImages"></div>
+        </div>
+    </div>
+    
+    <script>
+        const fragranceNotes = {
+            "Bergamot": "https://example.com/bergamot.jpg",
+            "Lemon": "https://example.com/lemon.jpg",
+            "Peach": "https://example.com/peach.jpg",
+            "Rose": "https://example.com/rose.jpg",
+            "Osmanthus": "https://example.com/osmanthus.jpg",
+            "Iris": "https://example.com/iris.jpg",
+            "Vetiver": "https://example.com/vetiver.jpg",
+            "Amber": "https://example.com/amber.jpg",
+            "Cambodian Oud": "https://example.com/oud.jpg",
+            "Sandalwood": "https://example.com/sandalwood.jpg",
+            "Tonka Bean": "https://example.com/tonka.jpg",
+        };
+        
+        function autocomplete(input) {
+            input.addEventListener("input", function() {
+                let val = this.value;
+                closeAllLists();
+                if (!val) return false;
+                let divList = document.createElement("div");
+                divList.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(divList);
+                for (let note in fragranceNotes) {
+                    if (note.toLowerCase().includes(val.toLowerCase())) {
+                        let divItem = document.createElement("div");
+                        divItem.innerHTML = note;
+                        divItem.addEventListener("click", function() {
+                            input.value = note;
+                            closeAllLists();
+                        });
+                        divList.appendChild(divItem);
+                    }
+                }
+            });
+            document.addEventListener("click", function(e) { closeAllLists(e.target); });
+        }
+        
+        function closeAllLists(elmnt) {
+            let items = document.getElementsByClassName("autocomplete-items");
+            for (let i = 0; i < items.length; i++) {
+                if (elmnt != items[i] && elmnt != document.getElementById("topNotes") && elmnt != document.getElementById("middleNotes") && elmnt != document.getElementById("baseNotes")) {
+                    items[i].parentNode.removeChild(items[i]);
+                }
+            }
+        }
+        
+        function generatePyramid() {
+            let topNotes = document.getElementById("topNotes").value.split(", ");
+            let middleNotes = document.getElementById("middleNotes").value.split(", ");
+            let baseNotes = document.getElementById("baseNotes").value.split(", ");
+            document.getElementById("displayTop").textContent = topNotes.join(", ");
+            document.getElementById("displayMiddle").textContent = middleNotes.join(", ");
+            document.getElementById("displayBase").textContent = baseNotes.join(", ");
+            document.getElementById("topImages").innerHTML = topNotes.map(note => `<img src="${fragranceNotes[note] || 'https://example.com/placeholder.jpg'}" class="note-image" alt="${note}">`).join('');
+            document.getElementById("middleImages").innerHTML = middleNotes.map(note => `<img src="${fragranceNotes[note] || 'https://example.com/placeholder.jpg'}" class="note-image" alt="${note}">`).join('');
+            document.getElementById("baseImages").innerHTML = baseNotes.map(note => `<img src="${fragranceNotes[note] || 'https://example.com/placeholder.jpg'}" class="note-image" alt="${note}">`).join('');
+            document.getElementById("fragrancePyramid").style.display = 'block';
+        }
+        
+        autocomplete(document.getElementById("topNotes"));
+        autocomplete(document.getElementById("middleNotes"));
+        autocomplete(document.getElementById("baseNotes"));
+    </script>
+</body>
+</html>
